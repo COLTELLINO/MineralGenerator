@@ -1,4 +1,3 @@
-
 name: MineralGenerator
 main: me.mineralgenerator.MineralGeneratorPlugin
 version: 1.0
@@ -6,9 +5,7 @@ api-version: 1.8.8
 author: Filip
 commands:
   mineralgenerator:
-	  description: Comando principale per il plugin MineralGenerator
-		  usage: /<command> reload
-		  aliases: [mg]
-		  permission: mineralgenerator.reload
-		  permission-message: "Non hai il permesso di eseguire questo comando."
+    description: Comando principale per il plugin MineralGenerator
+    usage: /<command> reload
+    aliases: [mg]
 description: Plugin per generare minerali in chest tramite macchinari personalizzati.
