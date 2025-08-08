@@ -141,7 +141,7 @@ public int getMaxMachines(Player player) {
                     if (block.getType() == Material.CHEST || block.getType() == Material.TRAPPED_CHEST) {
                         Inventory inv = ((Chest) block.getState()).getBlockInventory();
                         Material mineral = getRandomMineral();
-                        if (mineral != null) {
+                        if (mineral != null && inv.firstEmpty() != -1) {
                             // Solo IRON_ORE e GOLD_ORE generano il blocco grezzo, gli altri l'item
                             ItemStack toAdd;
                             switch (mineral) {
