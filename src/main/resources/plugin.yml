@@ -1,0 +1,7 @@
+name: MineralGenerator
+main: me.mineralgenerator.MineralGeneratorPlugin
+version: 1.0
+api-version: 1.8.8
+author: Filip
+commands: {}
+description: Plugin per generare minerali in chest tramite macchinari personalizzati.
