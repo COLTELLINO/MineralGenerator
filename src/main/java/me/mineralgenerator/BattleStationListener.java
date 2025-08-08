@@ -65,7 +65,7 @@ public class BattleStationListener implements Listener {
         }
     }
 
-    // Aggiorna il colore del cartello della battle station
+        // Aggiorna il colore del cartello della battle station
     private void updateBattleStationSign(Block brewingStand, String text) {
         Block diamond = brewingStand.getRelative(BlockFace.DOWN);
         if (diamond.getType() == Material.DIAMOND_BLOCK) {
