@@ -22,6 +22,21 @@ import java.util.*;
 public class GeneratorListener implements Listener {
     private final MineralGeneratorPlugin plugin;
     private final Map<Location, GeneratorData> generators = new HashMap<>();
+    // Carica un generatore da file
+    public void addLoadedGenerator(UUID owner, Location loc, boolean active) {
+        GeneratorData data = new GeneratorData(owner, loc);
+        data.active = active;
+        generators.put(loc, data);
+    }
+
+    // Restituisce tutti i generatori per il salvataggio
+    public List<Object[]> getAllGeneratorsForSave() {
+        List<Object[]> list = new ArrayList<>();
+        for (GeneratorData data : generators.values()) {
+            list.add(new Object[]{data.owner, data.location, data.active});
+        }
+        return list;
+    }
     private CompactorListener compactorListener;
     public void setCompactorListener(CompactorListener compactorListener) {
         this.compactorListener = compactorListener;

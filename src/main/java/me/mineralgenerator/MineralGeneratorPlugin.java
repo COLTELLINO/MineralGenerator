@@ -7,10 +7,19 @@ import java.util.UUID;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+import java.io.File;
+import java.io.IOException;
+import org.bukkit.Location;
+
 public class MineralGeneratorPlugin extends JavaPlugin {
     private static MineralGeneratorPlugin instance;
     private GeneratorListener generatorListener;
     private CompactorListener compactorListener;
+
+    private File machinesFile;
+    private FileConfiguration machinesConfig;
 
     @Override
     public void onEnable() {
@@ -24,6 +33,9 @@ public class MineralGeneratorPlugin extends JavaPlugin {
         generatorListener.startGenerationTask();
         compactorListener.startCompactorTask();
         getLogger().info("MineralGenerator abilitato!");
+
+    // Carica macchinari da machines.yml
+    loadMachines();
     }
 
     @Override
@@ -46,7 +58,95 @@ public class MineralGeneratorPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        // Salva macchinari su machines.yml
+        saveMachines();
         getLogger().info("MineralGenerator disabilitato!");
+    }
+
+    private void loadMachines() {
+        machinesFile = new File(getDataFolder(), "machines.yml");
+        if (!machinesFile.exists()) {
+            saveResource("machines.yml", false);
+        }
+        machinesConfig = YamlConfiguration.loadConfiguration(machinesFile);
+
+        // Carica generatori
+        if (machinesConfig.isList("generators")) {
+            for (Object obj : machinesConfig.getList("generators")) {
+                if (obj instanceof org.bukkit.configuration.ConfigurationSection) {
+                    org.bukkit.configuration.ConfigurationSection sec = (org.bukkit.configuration.ConfigurationSection) obj;
+                    UUID owner = UUID.fromString(sec.getString("owner"));
+                    String world = sec.getString("world");
+                    double x = sec.getDouble("x");
+                    double y = sec.getDouble("y");
+                    double z = sec.getDouble("z");
+                    boolean active = sec.getBoolean("active", true);
+                    Location loc = new Location(getServer().getWorld(world), x, y, z);
+                    generatorListener.addLoadedGenerator(owner, loc, active);
+                }
+            }
+        }
+        // Carica compattatori
+        if (machinesConfig.isList("compactors")) {
+            for (Object obj : machinesConfig.getList("compactors")) {
+                if (obj instanceof org.bukkit.configuration.ConfigurationSection) {
+                    org.bukkit.configuration.ConfigurationSection sec = (org.bukkit.configuration.ConfigurationSection) obj;
+                    UUID owner = UUID.fromString(sec.getString("owner"));
+                    String world = sec.getString("world");
+                    double x = sec.getDouble("x");
+                    double y = sec.getDouble("y");
+                    double z = sec.getDouble("z");
+                    boolean active = sec.getBoolean("active", false);
+                    Location loc = new Location(getServer().getWorld(world), x, y, z);
+                    compactorListener.addLoadedCompactor(owner, loc, active);
+                }
+            }
+        }
+    }
+
+    private void saveMachines() {
+        machinesFile = new File(getDataFolder(), "machines.yml");
+        machinesConfig = new YamlConfiguration();
+
+        // Salva generatori
+        java.util.List<java.util.Map<String, Object>> gens = new java.util.ArrayList<>();
+        for (Object[] gen : generatorListener.getAllGeneratorsForSave()) {
+            UUID owner = (UUID) gen[0];
+            Location loc = (Location) gen[1];
+            boolean active = (Boolean) gen[2];
+            java.util.Map<String, Object> map = new java.util.HashMap<>();
+            map.put("owner", owner.toString());
+            map.put("world", loc.getWorld().getName());
+            map.put("x", loc.getX());
+            map.put("y", loc.getY());
+            map.put("z", loc.getZ());
+            map.put("active", active);
+            gens.add(map);
+        }
+        machinesConfig.set("generators", gens);
+
+        // Salva compattatori
+        java.util.List<java.util.Map<String, Object>> comps = new java.util.ArrayList<>();
+        for (Object[] comp : compactorListener.getAllCompactorsForSave()) {
+            UUID owner = (UUID) comp[0];
+            Location loc = (Location) comp[1];
+            boolean active = (Boolean) comp[2];
+            java.util.Map<String, Object> map = new java.util.HashMap<>();
+            map.put("owner", owner.toString());
+            map.put("world", loc.getWorld().getName());
+            map.put("x", loc.getX());
+            map.put("y", loc.getY());
+            map.put("z", loc.getZ());
+            map.put("active", active);
+            comps.add(map);
+        }
+        machinesConfig.set("compactors", comps);
+
+        try {
+            machinesConfig.save(machinesFile);
+        } catch (IOException e) {
+            getLogger().warning("Impossibile salvare machines.yml: " + e.getMessage());
+        }
     }
 
     public static MineralGeneratorPlugin getInstance() {

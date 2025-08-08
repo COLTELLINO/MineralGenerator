@@ -20,6 +20,21 @@ public class CompactorListener implements Listener {
     private final MineralGeneratorPlugin plugin;
     // Nuova struttura: location -> CompactorData (owner, location, attivo)
     private final Map<Location, CompactorData> compactors = new HashMap<>();
+    // Carica un compattatore da file
+    public void addLoadedCompactor(UUID owner, Location loc, boolean active) {
+        CompactorData data = new CompactorData(owner, loc);
+        data.active = active;
+        compactors.put(loc, data);
+    }
+
+    // Restituisce tutti i compattatori per il salvataggio
+    public List<Object[]> getAllCompactorsForSave() {
+        List<Object[]> list = new ArrayList<>();
+        for (CompactorData data : compactors.values()) {
+            list.add(new Object[]{data.owner, data.location, data.active});
+        }
+        return list;
+    }
 
     public CompactorListener(MineralGeneratorPlugin plugin) {
         this.plugin = plugin;

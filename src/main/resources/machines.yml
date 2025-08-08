@@ -1,0 +1,16 @@
+# Questo file YAML conterrà tutti i macchinari (generatori e compattatori) attivi
+# Esempio struttura:
+# generators:
+#   - owner: uuid
+#     world: world
+#     x: 0
+#     y: 64
+#     z: 0
+#     active: true
+# compactors:
+#   - owner: uuid
+#     world: world
+#     x: 0
+#     y: 64
+#     z: 0
+#     active: false
