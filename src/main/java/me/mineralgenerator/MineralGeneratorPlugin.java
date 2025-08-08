@@ -34,8 +34,8 @@ public class MineralGeneratorPlugin extends JavaPlugin {
         compactorListener.startCompactorTask();
         getLogger().info("MineralGenerator abilitato!");
 
-    // Carica macchinari da machines.yml
-    loadMachines();
+        // Carica macchinari da machines.yml
+        loadMachines();
     }
 
     @Override
@@ -64,6 +64,7 @@ public class MineralGeneratorPlugin extends JavaPlugin {
     }
 
     private void loadMachines() {
+    getLogger().info("\u001B[32m[DEBUG] Sto caricando le macchine...\u001B[0m");
         machinesFile = new File(getDataFolder(), "machines.yml");
         if (!machinesFile.exists()) {
             saveResource("machines.yml", false);
@@ -73,38 +74,46 @@ public class MineralGeneratorPlugin extends JavaPlugin {
         // Carica generatori
         if (machinesConfig.isList("generators")) {
             for (Object obj : machinesConfig.getList("generators")) {
-                if (obj instanceof org.bukkit.configuration.ConfigurationSection) {
-                    org.bukkit.configuration.ConfigurationSection sec = (org.bukkit.configuration.ConfigurationSection) obj;
-                    UUID owner = UUID.fromString(sec.getString("owner"));
-                    String world = sec.getString("world");
-                    double x = sec.getDouble("x");
-                    double y = sec.getDouble("y");
-                    double z = sec.getDouble("z");
-                    boolean active = sec.getBoolean("active", true);
-                    Location loc = new Location(getServer().getWorld(world), x, y, z);
-                    generatorListener.addLoadedGenerator(owner, loc, active);
+                if (obj instanceof java.util.Map) {
+                    java.util.Map<?,?> map = (java.util.Map<?,?>) obj;
+                    try {
+                        UUID owner = UUID.fromString(map.get("owner").toString());
+                        String world = map.get("world").toString();
+                        double x = Double.parseDouble(map.get("x").toString());
+                        double y = Double.parseDouble(map.get("y").toString());
+                        double z = Double.parseDouble(map.get("z").toString());
+                        boolean active = Boolean.parseBoolean(map.get("active").toString());
+                        Location loc = new Location(getServer().getWorld(world), x, y, z);
+                        generatorListener.addLoadedGenerator(owner, loc, active);
+                    } catch (Exception e) {
+                        getLogger().warning("[DEBUG] Errore caricando un generatore: " + e.getMessage());
+                    }
                 }
             }
         }
         // Carica compattatori
         if (machinesConfig.isList("compactors")) {
             for (Object obj : machinesConfig.getList("compactors")) {
-                if (obj instanceof org.bukkit.configuration.ConfigurationSection) {
-                    org.bukkit.configuration.ConfigurationSection sec = (org.bukkit.configuration.ConfigurationSection) obj;
-                    UUID owner = UUID.fromString(sec.getString("owner"));
-                    String world = sec.getString("world");
-                    double x = sec.getDouble("x");
-                    double y = sec.getDouble("y");
-                    double z = sec.getDouble("z");
-                    boolean active = sec.getBoolean("active", false);
-                    Location loc = new Location(getServer().getWorld(world), x, y, z);
-                    compactorListener.addLoadedCompactor(owner, loc, active);
+                if (obj instanceof java.util.Map) {
+                    java.util.Map<?,?> map = (java.util.Map<?,?>) obj;
+                    try {
+                        UUID owner = UUID.fromString(map.get("owner").toString());
+                        String world = map.get("world").toString();
+                        double x = Double.parseDouble(map.get("x").toString());
+                        double y = Double.parseDouble(map.get("y").toString());
+                        double z = Double.parseDouble(map.get("z").toString());
+                        boolean active = Boolean.parseBoolean(map.get("active").toString());
+                        Location loc = new Location(getServer().getWorld(world), x, y, z);
+                        compactorListener.addLoadedCompactor(owner, loc, active);
+                    } catch (Exception e) {
+                        getLogger().warning("[DEBUG] Errore caricando un compattatore: " + e.getMessage());
+                    }
                 }
             }
         }
     }
 
-    private void saveMachines() {
+    public void saveMachines() {
         machinesFile = new File(getDataFolder(), "machines.yml");
         machinesConfig = new YamlConfiguration();
 

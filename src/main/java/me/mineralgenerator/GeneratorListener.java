@@ -1,4 +1,3 @@
-
 package me.mineralgenerator;
 
 import org.bukkit.Bukkit;
@@ -24,9 +23,10 @@ public class GeneratorListener implements Listener {
     private final Map<Location, GeneratorData> generators = new HashMap<>();
     // Carica un generatore da file
     public void addLoadedGenerator(UUID owner, Location loc, boolean active) {
-        GeneratorData data = new GeneratorData(owner, loc);
-        data.active = active;
-        generators.put(loc, data);
+    GeneratorData data = new GeneratorData(owner, loc);
+    data.active = active;
+    generators.put(loc, data);
+    plugin.getLogger().info("\u001B[32m[DEBUG] Caricato generatore: " + owner + " @ " + loc + " attivo=" + active + "\u001B[0m");
     }
 
     // Restituisce tutti i generatori per il salvataggio
@@ -34,6 +34,7 @@ public class GeneratorListener implements Listener {
         List<Object[]> list = new ArrayList<>();
         for (GeneratorData data : generators.values()) {
             list.add(new Object[]{data.owner, data.location, data.active});
+            plugin.getLogger().info("\u001B[32m[DEBUG] Salvo generatore: " + data.owner + " @ " + data.location + " attivo=" + data.active + "\u001B[0m");
         }
         return list;
     }
@@ -60,6 +61,7 @@ public class GeneratorListener implements Listener {
                     data.active = false;
                     generators.put(block.getLocation(), data);
                     player.sendMessage("§aGeneratore costruito! Per attivarlo usa la leva.");
+                    plugin.saveMachines();
                 }
             }, 10L);
         }
@@ -84,10 +86,12 @@ public class GeneratorListener implements Listener {
                         data.active = true;
                         updateGeneratorSign(chest, "§a[GENERATORE]");
                         event.getPlayer().sendMessage("§aGeneratore attivato!");
+                        plugin.saveMachines();
                     } else {
                         data.active = false;
                         updateGeneratorSign(chest, "§c[GENERATORE]");
                         event.getPlayer().sendMessage("§cGeneratore disattivato!");
+                        plugin.saveMachines();
                     }
                 }
             }
@@ -196,6 +200,7 @@ public int getMaxMachines(Player player) {
             // Rimuovi generatori non più validi
             for (Location loc : toRemove) {
                 generators.remove(loc);
+                plugin.saveMachines();
             }
         }, interval * 20L, interval * 20L);
     }

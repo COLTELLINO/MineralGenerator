@@ -25,6 +25,7 @@ public class CompactorListener implements Listener {
         CompactorData data = new CompactorData(owner, loc);
         data.active = active;
         compactors.put(loc, data);
+    plugin.getLogger().info("\u001B[32m[DEBUG] Caricato compattatore: " + owner + " @ " + loc + " attivo=" + active + "\u001B[0m");
     }
 
     // Restituisce tutti i compattatori per il salvataggio
@@ -32,6 +33,7 @@ public class CompactorListener implements Listener {
         List<Object[]> list = new ArrayList<>();
         for (CompactorData data : compactors.values()) {
             list.add(new Object[]{data.owner, data.location, data.active});
+            plugin.getLogger().info("\u001B[32m[DEBUG] Salvo compattatore: " + data.owner + " @ " + data.location + " attivo=" + data.active + "\u001B[0m");
         }
         return list;
     }
@@ -53,6 +55,7 @@ public class CompactorListener implements Listener {
                     compactorData.active = false;
                     compactors.put(block.getLocation(), compactorData);
                     player.sendMessage("§aCompattatore costruito! Per attivarlo usa la leva.");
+                    plugin.saveMachines();
                 }
             }, 10L);
         }
@@ -76,10 +79,12 @@ public class CompactorListener implements Listener {
                         data.active = true;
                         updateCompactorSign(chest, "§a[COMPATTATORE]");
                         event.getPlayer().sendMessage("§aCompattatore attivato!");
+                        plugin.saveMachines();
                     } else {
                         data.active = false;
                         updateCompactorSign(chest, "§c[COMPATTATORE]");
                         event.getPlayer().sendMessage("§cCompattatore disattivato!");
+                        plugin.saveMachines();
                     }
                 }
             }
@@ -108,6 +113,7 @@ public class CompactorListener implements Listener {
             }
             for (Location loc : toRemove) {
                 compactors.remove(loc);
+                plugin.saveMachines();
             }
         }, interval * 20L, interval * 20L);
     }
