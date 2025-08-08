@@ -11,6 +11,8 @@ public class MineralGeneratorPlugin extends JavaPlugin {
     private static MineralGeneratorPlugin instance;
     private GeneratorListener generatorListener;
     private CompactorListener compactorListener;
+    private BattleStationListener battleStationListener;
+    private DropFarmerListener dropFarmerListener;
 
     @Override
     public void onEnable() {
@@ -18,11 +20,17 @@ public class MineralGeneratorPlugin extends JavaPlugin {
         saveDefaultConfig();
         generatorListener = new GeneratorListener(this);
         compactorListener = new CompactorListener(this);
+        battleStationListener = new BattleStationListener(this);
+        dropFarmerListener = new DropFarmerListener(this);
         getServer().getPluginManager().registerEvents(generatorListener, this);
         getServer().getPluginManager().registerEvents(compactorListener, this);
+        getServer().getPluginManager().registerEvents(battleStationListener, this);
+        getServer().getPluginManager().registerEvents(dropFarmerListener, this);
         generatorListener.setCompactorListener(compactorListener);
         generatorListener.startGenerationTask();
         compactorListener.startCompactorTask();
+        battleStationListener.startBattleStationTask();
+        dropFarmerListener.startDropFarmerTask();
         getLogger().info("MineralGenerator abilitato!");
     }
 
